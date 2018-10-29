@@ -16,18 +16,50 @@ public class FitaService {
 
 		List<String> numeros = new ArrayList<>();
 		List<String> variaveis = new ArrayList<>();
-
+		StringBuilder fitaFinal = new StringBuilder("");
 		String[] tokens = fita.getFita().split(" ");
 
 		for (int i = 0; i < tokens.length; i++) {
 			for (Character c : tokens[i].toCharArray()) {
 				if (Character.isDigit(c)) {
-					continue;
+					Integer index = null;
+					for (Character c2 : tokens[i].toCharArray()) {
+						if(Character.isLetter(c2)) {
+							index = tokens[i].indexOf(c2);
+							break;
+						}
+					}
+					if(index != null) {
+						String variavel = tokens[i].substring(index);
+						String numeral = tokens[i].substring(0, index);
+						
+						if (!numeros.contains(numeral) && !"".equals(numeral)) {
+							numeros.add(numeral);
+							fitaFinal.append("N(").append(numeral).append(")");
+						}
+						
+						if (!variaveis.contains(variavel) && !"".equals(variavel)) {
+							fitaFinal.append("V(").append(variaveis.size()).append(")");
+							variaveis.add(variavel);
+						} else {
+							fitaFinal.append("V(").append(variaveis.indexOf(variavel)).append(")");
+						}
+						break;
+					} else {
+						if (!numeros.contains(tokens[i])) {
+							numeros.add(tokens[i]);
+							fitaFinal.append("N(").append(tokens[i]).append(")");
+							break;
+						}
+					}
 				} else {
 					if (!variaveis.contains(tokens[i])) {
+						fitaFinal.append("V(").append(variaveis.size()).append(")");
 						variaveis.add(tokens[i]);
-						break;
+					} else {
+						fitaFinal.append("V(").append(variaveis.indexOf(tokens[i])).append(")");
 					}
+					break;
 				}
 			}
 		}
@@ -41,14 +73,6 @@ public class FitaService {
 
 		System.out.println("");
 
-		for (int i = 0; i < tokens.length; i++) {
-			if (!variaveis.contains(tokens[i])) {
-				if (!numeros.contains(tokens[i])) {
-					numeros.add(tokens[i]);
-				}
-			}
-		}
-
 		System.out.println("TABELA DE NUMEROS");
 		for (int i = 0; i < numeros.size(); i++) {
 			System.out.println(i + " ... " + numeros.get(i));
@@ -56,16 +80,6 @@ public class FitaService {
 		}
 		
 		System.out.println("LISTA DA FITA LÁ");
-		StringBuilder fitaFinal = new StringBuilder("");
-		Integer indexNumerais = 0;
-		for (int i = 0; i < tokens.length; i++) {
-			if(variaveis.contains(tokens[i])) {
-				fitaFinal.append("V(").append(i).append(")");
-			} else {
-				fitaFinal.append("N(").append(numeros.get(indexNumerais)).append(")");
-				indexNumerais++;
-			}
-		}
 		System.out.println(fitaFinal.toString());
 		result.setFita(fitaFinal.toString());
 
